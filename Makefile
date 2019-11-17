@@ -12,3 +12,5 @@ test-watch:
 	npx jest --watch
 test-covegare:
 	npx jest --coverage
+lint:
+	npx eslint .
