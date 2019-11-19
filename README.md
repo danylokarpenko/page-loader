@@ -16,6 +16,8 @@ Options:
   -V, --version        output the current version
   -o, --output [path]  choose path to output directory (default: "Current directory")
   -h, --help           output usage information
+
 `
+
 ##Asciinema:
 [How to download page data](https://asciinema.org/a/5h8dXMVWpSDx3CruMBV3ZiSNO)
