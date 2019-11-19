@@ -1,5 +1,3 @@
-import savePageData from './save'
+import savePageData from './save';
 
-export default (url, outputPath) => {
-  return savePageData(url, outputPath);
-}
+export default (url, outputPath) => savePageData(url, outputPath);

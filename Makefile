@@ -2,6 +2,7 @@ publish:
 	npm run prepublishOnly
 	npm publish --dry-run
 prepublishOnly:
+	make build
 	npm run prepublishOnly
 build:
 	rm -rf dist
