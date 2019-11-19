@@ -5,8 +5,8 @@ import _path from 'path';
 import url from 'url';
 
 const getFileName = (link) => {
-  const { host, path } = url.parse(link);
-  const name = `${host}${path}`.replace(/[./]/g, '-');
+  const { hostname, path } = url.parse(link);
+  const name = `${hostname}${path}`.replace(/[./]/g, '-');
   return `${name}.html`;
 };
 

@@ -13,8 +13,6 @@ program
   .action((url, options) => {
     const outputPath = options.output;
     pageload(url, outputPath);
-    console.log('URL: ', url);
-    console.log('output path: ', options.output);
   });
 
 program.parse(process.argv);
