@@ -1,34 +1,41 @@
 import nock from 'nock';
 import os from 'os';
 import path from 'path';
-import fs from 'fs';
+import {promises as fs} from 'fs';
 import url from 'url';
 import pageload from '../src';
 
 const getFixturePath = (filename) => `${__dirname}/__fixtures__/${filename}`;
 
-let outDirpath;
-let fullFilePath;
+const getFileName = (link) => {
+  const { host, path } = url.parse(link);
+  const name = `${host}${path}`.replace(/[\.\/]/g, '-');
+  return `${name}.html`;
+}
+
 const link = 'https://hexlet.io/courses';
-
+let newDirpath;
+let nockBody;
 beforeEach(async () => {
-  outDirpath = os.tmpdir();
-  const fileName = 'hexlet-io-courses.html';
-  fullFilePath = path.join(tmpDir, fileName);
-
+  newDirpath = await fs.mkdtemp('/tmp/');
+  nockBody = await fs.readFile(getFixturePath('hexlet-io-courses.html'), 'utf-8');
 })
 
 nock.disableNetConnect();
 
 test('pageload save data', async () => {
-  const scope = nock(url)
-    .get(path)
-    .reply(200, []);
+  const scope = nock('https://hexlet.io')
+    .get('/courses')
+    .reply(200, nockBody);
 
-    await pageload(link, outDirpath);
+    await pageload(link, newDirpath);
 
-    const actual = await fs.readFile(fullFilePath);
-    
+    const loadedData = await fs.readFile(path.join(newDirpath, getFileName(link)), 'utf-8');
+
     expect(scope.isDone()).toBeTruthy();
-    expect(data1).toBeTruthy('Hello!');
+    expect(loadedData).toBe(nockBody);
+})
+
+afterEach(async  () => {
+  await fs.rmdir(newDirpath, {recursive: true});
 })

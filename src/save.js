@@ -5,18 +5,19 @@ import url from 'url';
 
 const getFileName = (link) => {
   const { host, path } = url.parse(link);
-  const name = `${host}${path}`.replace(/\//g, '-').replace(/\./g, '-');
+  const name = `${host}${path}`.replace(/[\.\/]/g, '-');
   return `${name}.html`;
 }
 
-const saveData = (link, dest) => {
-  const filePath = path.join(dest, getFileName(link));
+export default (link, dirpath) => {
+  const filePath = path.join(dirpath, getFileName(link));
+
   return axios
     .get(link)
     .then((response) => {
-      fs.writeFile(filePath, response);
+      fs.writeFile(filePath, response.data);
     })
-    .catch(console.log);
+    .catch((err) => {
+      throw err;
+    });
 }
-
-// saveData('https://soundcloud.com', '/tmp');
