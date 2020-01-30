@@ -6,6 +6,7 @@ prepublishOnly:
 	npm run prepublishOnly
 build:
 	rm -rf dist
+	rm -rf /home/danylo/page/*
 	npm run build
 test:
 	npm test
