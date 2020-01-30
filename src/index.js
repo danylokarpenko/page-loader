@@ -16,16 +16,16 @@ const getFileName = (link) => {
 const getFolderName = (link) => {
   const { hostname, pathname } = url.parse(link);
   const folderName = `${hostname}${pathname}`.replace(/[./]/g, '-');
-  return folderName
+  return folderName;
 }
 
 export default (pageUrl, dirpath) => {
   const pageFilePath = path.join(dirpath, `${getFolderName(pageUrl)}.html`);
-  const localFilesPath = path.join(dirpath,`${getFolderName(pageUrl)}_files`);
+  const srcDirPath = path.join(dirpath,`${getFolderName(pageUrl)}_files`);
 
   const pageData = axios.get(pageUrl)
   .then((response) => fs.writeFile(pageFilePath, response.data))
-  .then(() => fs.mkdir(localFilesPath))
+  .then(() => fs.mkdir(srcDirPath))
   .then(() => fs.readFile(pageFilePath))
   .then((data) => {
     const configs = getRequestConfigs(data, pageUrl);
@@ -44,7 +44,7 @@ export default (pageUrl, dirpath) => {
       .map((value) => {
         const fileName = getFileName(value.url);
 
-        return fs.writeFile(path.join(localFilesPath, fileName), value.response.data)
+        return fs.writeFile(path.join(srcDirPath, fileName), value.response.data)
         .then((d) => ({ result: 'success', data: d }))
         .catch((e) => ({ result: 'error', error: e }))
       });
@@ -53,7 +53,7 @@ export default (pageUrl, dirpath) => {
   })
   .then(() => fs.readFile(pageFilePath))
   .then((data) => {
-    const updatedHtml = updateLinks(data, `${getFolderName(pageUrl)}_files`);
+    const updatedHtml = updateLinks(data, srcDirPath);
     return fs.writeFile(pageFilePath, updatedHtml);
   })
 

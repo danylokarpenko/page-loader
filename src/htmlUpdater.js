@@ -23,8 +23,9 @@ export default (html, localFilesPath) => {
     }
     const { hostname } = url.parse(src);
     return !hostname;
-  })
-  .each((i, node) => {
+  });
+
+  tagsWithLocalResources.each((i, node) => {
     const src = $(node).attr('src');
     const localPath = path.join(localFilesPath, getFileName(src));
     $(node).attr('src', localPath);
