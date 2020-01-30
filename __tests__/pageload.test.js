@@ -60,5 +60,5 @@ test('pageload save data', async () => {
 });
 
 afterEach(async () => {
-  await fs.rmdir(distPath, { recursive: true });
+  // await fs.rmdir(distPath, { recursive: true });
 });

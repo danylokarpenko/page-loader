@@ -22,3 +22,5 @@ Options:
 ### Asciinema:
 
 [How to download page data](https://asciinema.org/a/5h8dXMVWpSDx3CruMBV3ZiSNO)
+
+[![Download page with local files](https://asciinema.org/a/BMfxI7ZlQG15loFXIVSJICEWr.svg)](https://asciinema.org/a/BMfxI7ZlQG15loFXIVSJICEWr)

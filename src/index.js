@@ -7,9 +7,9 @@ import url from 'url';
 
 const getFileName = (link) => {
   const { hostname, pathname } = url.parse(link);
-  const { dir, name, ext } = path.parse(pathname);
+  const { dir, name, ext } = path.parse(pathname.slice(1));
   const fileName = hostname ? path.join(hostname, dir, name) : path.join(dir, name);
-  const normalizedName = fileName.slice(1).replace(/[./]/g, '-');
+  const normalizedName = fileName.replace(/[./]/g, '-');
   return `${normalizedName}${ext}`
 };
 
