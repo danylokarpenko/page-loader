@@ -7,7 +7,7 @@ import url from 'url';
 import debugLib from 'debug';
 
 const debug = debugLib('pageloader-util');
-debugLib.enable('pageloader-util')
+
 const getFileName = (link) => {
   const { hostname, pathname } = url.parse(link);
   const { dir, name, ext } = path.parse(pathname.slice(1));

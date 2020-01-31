@@ -4,6 +4,7 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import url from 'url';
 import pageload from '../src';
+import debug from 'debug';
 
 const getFixturePath = (filename) => `${__dirname}/__fixtures__/${filename}`;
 
@@ -26,6 +27,7 @@ let nockBody;
 beforeEach(async () => {
   distPath = await fs.mkdtemp(path.join(os.tmpdir(), 'loader-'));
   nockBody = await fs.readFile(getFixturePath('hexlet-io-courses.html'), 'utf-8');
+  debug.enable('pageloader-util');
 });
 
 nock.disableNetConnect();
@@ -60,5 +62,6 @@ test('pageload save data', async () => {
 });
 
 afterEach(async () => {
-  // await fs.rmdir(distPath, { recursive: true });
+  await fs.rmdir(distPath, { recursive: true });
+  debug.disable();
 });
