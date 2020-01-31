@@ -21,6 +21,8 @@ Options:
 
 ### Asciinema:
 
-[How to download page data](https://asciinema.org/a/5h8dXMVWpSDx3CruMBV3ZiSNO)
+[![How to download page data](https://asciinema.org/a/BMfxI7ZlQG15loFXIVSJICEWr.svg)](https://asciinema.org/a/BMfxI7ZlQG15loFXIVSJICEWr)
 
 [![Download page with local files](https://asciinema.org/a/BMfxI7ZlQG15loFXIVSJICEWr.svg)](https://asciinema.org/a/BMfxI7ZlQG15loFXIVSJICEWr)
+
+[![Testing with debug](https://asciinema.org/a/12PRzUg2TjvIWoyVJNg0Yt5Tm.svg)](https://asciinema.org/a/12PRzUg2TjvIWoyVJNg0Yt5Tm)
