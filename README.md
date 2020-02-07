@@ -26,3 +26,5 @@ Options:
 [![Download page with local files](https://asciinema.org/a/BMfxI7ZlQG15loFXIVSJICEWr.svg)](https://asciinema.org/a/BMfxI7ZlQG15loFXIVSJICEWr)
 
 [![Testing with debug](https://asciinema.org/a/12PRzUg2TjvIWoyVJNg0Yt5Tm.svg)](https://asciinema.org/a/12PRzUg2TjvIWoyVJNg0Yt5Tm)
+
+[![Examples of possible errors](https://asciinema.org/a/ZylFwJhpECYgOFxEs4Ar4Z5Jq.svg)](https://asciinema.org/a/ZylFwJhpECYgOFxEs4Ar4Z5Jq)

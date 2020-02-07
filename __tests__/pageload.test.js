@@ -32,7 +32,7 @@ beforeEach(async () => {
 
 nock.disableNetConnect();
 
-test('pageload save data', async () => {
+test('Successful page loading', async () => {
   const scope = nock('https://hexlet.io')
     .get('/courses')
     .reply(200, nockBody);
@@ -59,6 +59,25 @@ test('pageload save data', async () => {
   expect(sources.length).toBe(2);
   expect(sources.includes('file1')).toBeTruthy();
   expect(sources.includes('file2.js')).toBeTruthy();
+});
+
+test('Must throw 404 error', async () => {
+  const scope = nock('https://hexlet.io')
+    .get('/courses')
+    .replyWithError({
+      message: 'Error: Request failed with status code 404',
+      code: 'NOT_FOUND',
+    })
+
+  expect(pageload(link, distPath)).rejects.toThrow('404');
+});
+
+test('Must throw ENOENT error', async () => {
+  const scope = nock('https://hexlet.io')
+    .get('/courses')
+    .reply(200, nockBody);
+
+  expect(pageload(link, 'unknownPath')).rejects.toThrow('ENOENT');
 });
 
 afterEach(async () => {

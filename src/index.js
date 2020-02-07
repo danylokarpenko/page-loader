@@ -1,5 +1,6 @@
 import getRequestConfigs from './configFetcher.js';
 import updateLinks from './htmlUpdater.js';
+import processError from './error.js';
 import { promises as fs } from 'fs';
 import axios from 'axios';
 import path from 'path';
@@ -67,6 +68,7 @@ export default (pageUrl, dirpath) => {
     debug('rewriting pageHtml');
     return fs.writeFile(pageFilePath, updatedHtml);
   })
+  .catch((error) => processError(error.message, error.fileName, error.lineNumber))
 
   return pageData;
 }

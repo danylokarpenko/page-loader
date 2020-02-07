@@ -12,7 +12,10 @@ program
   .option('-o, --output [path]', 'choose path to output directory', __dirname)
   .action((url, options) => {
     const outputPath = options.output;
-    pageload(url, outputPath).catch(console.log);
+    pageload(url, outputPath).catch((error) => {
+      console.error(error);
+      process.exit(1);
+    })
   });
 
 program.parse(process.argv);
