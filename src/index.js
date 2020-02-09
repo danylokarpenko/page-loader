@@ -44,15 +44,13 @@ export default (pageUrl, dirpath) => {
           debug(`Method ${config.method} to local link: ${config.url}`);
           return {
             title: `Method ${config.method} to local link: ${config.url}`,
-            task: () => {
-              return axios(config)
-                .then((response) => {
-                  debug(`Saving locally from ${config.url}`);
+            task: () => axios(config)
+              .then((response) => {
+                debug(`Saving locally from ${config.url}`);
 
-                  const fileName = getFileName(config.url);
-                  return fs.writeFile(path.join(srcDirPath, fileName), response.data);
-                });
-            },
+                const fileName = getFileName(config.url);
+                return fs.writeFile(path.join(srcDirPath, fileName), response.data);
+              }),
           };
         });
 
@@ -65,8 +63,10 @@ export default (pageUrl, dirpath) => {
       return fs.writeFile(pageFilePath, updatedHtml);
     })
     .then(() => {
-      debug('Returning promises')
-      return new Listr(tasks, { concurrent: true, exitOnError: false }).run().catch((error) => {error});
+      debug('Returning promises');
+      return new Listr(tasks, { concurrent: true, exitOnError: false })
+        .run()
+        .catch((error) => ({ error }));
     })
     .catch((error) => processError(error));
 

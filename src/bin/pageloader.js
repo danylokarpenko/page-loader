@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import Listr from 'listr';
 import program from 'commander';
 import pageload from '..';
 
