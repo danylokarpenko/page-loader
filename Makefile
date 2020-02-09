@@ -9,6 +9,7 @@ build:
 	rm -rf /home/danylo/page/*
 	npm run build
 test:
+	npx eslint .
 	npm test
 test-watch:
 	npx jest --watch

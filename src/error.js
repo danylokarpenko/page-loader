@@ -1,3 +1,3 @@
-export default  (message, fileName, lineNumber) => {
+export default ({ message, fileName, lineNumber }) => {
   throw new Error(message, fileName, lineNumber);
 };
