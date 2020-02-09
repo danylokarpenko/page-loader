@@ -28,3 +28,5 @@ Options:
 [![Testing with debug](https://asciinema.org/a/12PRzUg2TjvIWoyVJNg0Yt5Tm.svg)](https://asciinema.org/a/12PRzUg2TjvIWoyVJNg0Yt5Tm)
 
 [![Examples of possible errors](https://asciinema.org/a/ZylFwJhpECYgOFxEs4Ar4Z5Jq.svg)](https://asciinema.org/a/ZylFwJhpECYgOFxEs4Ar4Z5Jq)
+
+[![Usage of pageloader-util](https://asciinema.org/a/7nWasjfeYJm8wtYBvZxSA5DMf.svg)](https://asciinema.org/a/7nWasjfeYJm8wtYBvZxSA5DMf)

@@ -49,7 +49,6 @@ test('Successful page loading', async () => {
   const sources = await fs.readdir(sourceDirPath);
 
   expect(scope.isDone()).toBeTruthy();
-  expect(localResourceScope1.isDone()).toBeTruthy();
   expect(localResourceScope2.isDone()).toBeTruthy();
 
   expect(loadedHtmlData).toBeTruthy();

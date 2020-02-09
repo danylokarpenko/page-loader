@@ -1,3 +1,4 @@
+import Listr from 'listr';
 import { promises as fs } from 'fs';
 import axios from 'axios';
 import path from 'path';
@@ -28,7 +29,7 @@ export default (pageUrl, dirpath) => {
   const pageFilePath = path.join(dirpath, `${getFolderName(pageUrl)}.html`);
   const srcDirPath = path.join(dirpath, `${getFolderName(pageUrl)}_files`);
 
-  let resourcePromises;
+  let tasks;
 
   const pageData = axios.get(pageUrl)
     .then((response) => fs.writeFile(pageFilePath, response.data))
@@ -38,31 +39,24 @@ export default (pageUrl, dirpath) => {
       debug('Read html data');
       const configs = getRequestConfigs(data, pageUrl);
 
-      const promises = configs
+      tasks = configs
         .map((config) => {
-          debug(`${config.method} ${config.url}`);
-          return axios(config)
-            .then((response) => ({ result: 'success', response, url: config.url }))
-            .catch((e) => ({ result: 'error', error: e }));
+          debug(`Method ${config.method} to local link: ${config.url}`);
+          return {
+            title: `Method ${config.method} to local link: ${config.url}`,
+            task: () => {
+              return axios(config)
+                .then((response) => {
+                  debug(`Saving locally from ${config.url}`);
+
+                  const fileName = getFileName(config.url);
+                  return fs.writeFile(path.join(srcDirPath, fileName), response.data);
+                });
+            },
+          };
         });
 
-      return Promise.all(promises);
-    })
-    .then((values) => {
-      resourcePromises = values
-        .filter((value) => value.result === 'success')
-        .map((value) => {
-          debug(`${value.result} ${value.url}`);
-          const fileName = getFileName(value.url);
-
-          return fs.writeFile(path.join(srcDirPath, fileName), value.response.data)
-            .then((d) => ({ result: 'success', data: d }))
-            .catch((e) => ({ result: 'error', error: e }));
-        });
-
-      debug('saving local files');
-
-      return resourcePromises;
+      return tasks;
     })
     .then(() => fs.readFile(pageFilePath))
     .then((data) => {
@@ -70,7 +64,10 @@ export default (pageUrl, dirpath) => {
       const updatedHtml = updateLinks(data, srcDirPath);
       return fs.writeFile(pageFilePath, updatedHtml);
     })
-    .then(() => resourcePromises)
+    .then(() => {
+      debug('Returning promises')
+      return new Listr(tasks, { concurrent: true, exitOnError: false }).run().catch((error) => {error});
+    })
     .catch((error) => processError(error));
 
   return pageData;
