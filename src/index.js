@@ -2,25 +2,24 @@ import Listr from 'listr';
 import { promises as fs } from 'fs';
 import axios from 'axios';
 import path from 'path';
-import url from 'url';
 import debugLib from 'debug';
-import getRequestConfigs from './configFetcher';
+import getConfigs from './configFetcher';
 import updateLinks from './htmlUpdater';
 import processError from './error';
 
 const debug = debugLib('pageloader-util');
 
-const getFileName = (link) => {
-  const { hostname, pathname } = url.parse(link);
-  const { dir, name, ext } = path.parse(pathname.slice(1));
-  const fileName = hostname ? path.join(hostname, dir, name) : path.join(dir, name);
+const getFileName = (link, baseURL) => {
+  const url = new URL(link, baseURL);
+  const { dir, name, ext } = path.parse(url.pathname.slice(1));
+  const fileName = path.join(dir, name);
   const normalizedName = fileName.replace(/[./]/g, '-');
   return `${normalizedName}${ext}`;
 };
 
-const getFolderName = (link) => {
-  const { hostname, pathname } = url.parse(link);
-  const folderName = `${hostname}${pathname}`.replace(/[./]/g, '-');
+const getFolderName = (link, baseURL) => {
+  const url = new URL(link, baseURL);
+  const folderName = `${url.hostname}${url.pathname}`.replace(/[./]/g, '-');
   return folderName;
 };
 
@@ -29,17 +28,18 @@ export default (pageUrl, dirpath) => {
   const pageFilePath = path.join(dirpath, `${getFolderName(pageUrl)}.html`);
   const srcDirPath = path.join(dirpath, `${getFolderName(pageUrl)}_files`);
 
-  let tasks;
+  let data;
 
   const pageData = axios.get(pageUrl)
-    .then((response) => fs.writeFile(pageFilePath, response.data))
+    .then((response) => {
+      data = response.data;
+      return data;
+    })
     .then(() => fs.mkdir(srcDirPath))
-    .then(() => fs.readFile(pageFilePath))
-    .then((data) => {
-      debug('Read html data');
-      const configs = getRequestConfigs(data, pageUrl);
-
-      tasks = configs
+    .then(() => {
+      debug('Getting configs for request to local resources and form tasks');
+      const configs = getConfigs(data, pageUrl);
+      const tasks = configs
         .map((config) => {
           debug(`Method ${config.method} to local link: ${config.url}`);
           return {
@@ -48,27 +48,25 @@ export default (pageUrl, dirpath) => {
               .then((response) => {
                 debug(`Saving locally from ${config.url}`);
 
-                const fileName = getFileName(config.url);
+                const fileName = getFileName(config.url, pageUrl);
                 return fs.writeFile(path.join(srcDirPath, fileName), response.data);
               }),
           };
         });
-
       return tasks;
     })
-    .then(() => fs.readFile(pageFilePath))
-    .then((data) => {
-      debug('Rewriting pageHtml');
-      const updatedHtml = updateLinks(data, srcDirPath);
-      return fs.writeFile(pageFilePath, updatedHtml);
-    })
-    .then(() => {
-      debug('Returning promises');
+    .then((tasks) => {
+      debug('Returning promises of requesting tp local resources');
       return new Listr(tasks, { concurrent: true, exitOnError: false })
         .run()
         .catch((error) => ({ error }));
     })
+    .then(() => {
+      debug('Rewriting pageHtml');
+      const updatedHtml = updateLinks(data, srcDirPath, pageUrl);
+      return fs.writeFile(pageFilePath, updatedHtml);
+    })
     .catch((error) => processError(error));
-
+  debug(`End of request to ${pageUrl}`);
   return pageData;
 };
