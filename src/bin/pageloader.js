@@ -9,7 +9,7 @@ program
 
 program
   .arguments('<url>')
-  .option('-o, --output [path]', 'choose path to output directory', __dirname)
+  .option('-o, --output [path]', 'choose path to output directory', process.cwd())
   .action((url, options) => {
     const outputPath = options.output;
     return pageload(url, outputPath)
