@@ -1,31 +1,45 @@
 import cheerio from 'cheerio';
-import url from 'url';
 
-export default (html, pageUrl) => {
+const checkIfRelativeUrl = (link) => {
+  const host = 'https://localhost';
+  const baseUrl = new URL(host);
+  const srcUrl = new URL(link, host);
+  const isRelativeUrl = srcUrl.hostname === baseUrl.hostname;
+  return isRelativeUrl;
+};
+
+const mapping = {
+  script: 'src',
+  link: 'href',
+  img: 'src',
+};
+
+const getLinks = (tags) => {
+  const links = tags.map((tag) => tag.attribs[mapping[tag.name]]);
+  return links;
+};
+
+const getTagsWithLocalLinks = (html) => {
   const $ = cheerio.load(html);
 
-  const tagsWithLocalResources = $('script').add('img').add('link')
-    .filter((i, tag) => {
-      const src = $(tag).attr('src');
-      if (!src) {
-        return false;
-      }
-      const { hostname } = url.parse(src);
-      return !hostname;
-    })
-    .get();
+  const tags = [];
 
-  const configs = tagsWithLocalResources
-    .map((tag) => (
-      tag.name === 'img' ? {
-        method: 'get',
-        url: tag.attribs.src,
-        baseURL: pageUrl,
-        responseType: 'arraybuffer',
-      } : {
-        method: 'get',
-        url: tag.attribs.src,
-        baseURL: pageUrl,
-      }));
+  Object.keys(mapping).forEach((tagName) => tags.push(...$(tagName).get()));
+  const tagsWithLocalLinks = tags
+    .filter((tag) => checkIfRelativeUrl(tag.attribs[mapping[tag.name]]));
+  return tagsWithLocalLinks;
+};
+
+export default (html, pageUrl) => {
+  const tags = getTagsWithLocalLinks(html);
+  const links = getLinks(tags);
+
+  const configs = links
+    .map((link) => ({
+      method: 'get',
+      url: link,
+      baseURL: pageUrl,
+      responseType: 'arraybuffer',
+    }));
   return configs;
 };

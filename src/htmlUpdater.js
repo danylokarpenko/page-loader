@@ -1,32 +1,50 @@
 import cheerio from 'cheerio';
 import path from 'path';
-import url from 'url';
 
-const getFileName = (link) => {
-  const { hostname, pathname } = url.parse(link);
-  const { dir, name, ext } = path.parse(pathname.slice(1));
-  const fileName = hostname ? path.join(hostname, dir, name) : path.join(dir, name);
+const getFileName = (link, baseUrl) => {
+  const url = new URL(link, baseUrl);
+  const { dir, name, ext } = path.parse(url.pathname.slice(1));
+  const fileName = path.join(dir, name);
   const normalizedName = fileName.replace(/[./]/g, '-');
   return `${normalizedName}${ext}`;
 };
 
-export default (html, localFilesPath) => {
+const checkIfRelativeUrl = (link) => {
+  const host = 'https://localhost';
+  const baseUrl = new URL(host);
+  const srcUrl = new URL(link, host);
+  const isRelativeUrl = srcUrl.hostname === baseUrl.hostname;
+  return isRelativeUrl;
+};
+
+const mapping = {
+  script: 'src',
+  link: 'href',
+  img: 'src',
+};
+
+const getTagsWithLocalLinks = (html) => {
   const $ = cheerio.load(html);
 
-  const tagsWithLocalResources = $('script').add('img').add('link')
-    .filter((i, tag) => {
-      const src = $(tag).attr('src');
-      if (!src) {
-        return false;
-      }
-      const { hostname } = url.parse(src);
-      return !hostname;
-    });
+  const tags = [];
 
-  tagsWithLocalResources.each((i, node) => {
-    const src = $(node).attr('src');
-    const localPath = path.join(localFilesPath, getFileName(src));
-    $(node).attr('src', localPath);
+  Object.keys(mapping).forEach((tagName) => tags.push(...$(tagName).get()));
+  const tagsWithLocalLinks = tags
+    .filter((tag) => checkIfRelativeUrl(tag.attribs[mapping[tag.name]]));
+  return tagsWithLocalLinks;
+};
+
+export default (html, distPath, pageUrl) => {
+  const $ = cheerio.load(html);
+
+  const tags = getTagsWithLocalLinks(html);
+
+  tags.forEach((i, tag) => {
+    const { name } = tag;
+    const attribut = mapping[name];
+    const link = $(name).attr(attribut);
+    const localPath = path.join(distPath, getFileName(link, pageUrl));
+    $(name).attr(attribut, localPath);
   });
 
   return $.html();
