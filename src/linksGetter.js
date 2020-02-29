@@ -30,16 +30,9 @@ const getTagsWithLocalLinks = (html) => {
   return tagsWithLocalLinks;
 };
 
-export default (html, pageUrl) => {
+export default (html) => {
   const tags = getTagsWithLocalLinks(html);
   const links = getLinks(tags);
 
-  const configs = links
-    .map((link) => ({
-      method: 'get',
-      url: link,
-      baseURL: pageUrl,
-      responseType: 'arraybuffer',
-    }));
-  return configs;
+  return links;
 };

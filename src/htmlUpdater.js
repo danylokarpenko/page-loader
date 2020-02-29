@@ -1,5 +1,6 @@
 import cheerio from 'cheerio';
 import path from 'path';
+import getLinks from './linksGetter';
 
 const getFileName = (link, baseUrl) => {
   const url = new URL(link, baseUrl);
@@ -9,35 +10,16 @@ const getFileName = (link, baseUrl) => {
   return `${normalizedName}${ext}`;
 };
 
-const checkIfRelativeUrl = (link) => {
-  const host = 'https://localhost';
-  const baseUrl = new URL(host);
-  const srcUrl = new URL(link, host);
-  const isRelativeUrl = srcUrl.hostname === baseUrl.hostname;
-  return isRelativeUrl;
-};
-
 const mapping = {
   script: 'src',
   link: 'href',
   img: 'src',
 };
 
-const getTagsWithLocalLinks = (html) => {
-  const $ = cheerio.load(html);
-
-  const tags = [];
-
-  Object.keys(mapping).forEach((tagName) => tags.push(...$(tagName).get()));
-  const tagsWithLocalLinks = tags
-    .filter((tag) => checkIfRelativeUrl(tag.attribs[mapping[tag.name]]));
-  return tagsWithLocalLinks;
-};
-
 export default (html, distPath, pageUrl) => {
   const $ = cheerio.load(html);
 
-  const tags = getTagsWithLocalLinks(html);
+  const tags = getLinks(html);
 
   tags.forEach((i, tag) => {
     const { name } = tag;

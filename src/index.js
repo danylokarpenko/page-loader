@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import axios from 'axios';
 import path from 'path';
 import debugLib from 'debug';
-import getConfigs from './configFetcher';
+import getLinks from './linksGetter';
 import updateLinks from './htmlUpdater';
 import processError from './error';
 
@@ -38,28 +38,30 @@ export default (pageUrl, dirpath) => {
     .then(() => fs.mkdir(srcDirPath))
     .then(() => {
       debug('Getting configs for request to local resources and form tasks');
-      const configs = getConfigs(data, pageUrl);
-      const tasks = configs
-        .map((config) => {
-          debug(`Method ${config.method} to local link: ${config.url}`);
+      const links = getLinks(data);
+      const tasks = links
+        .map((link) => {
+          debug(`Method GET to local link: ${link}`);
           return {
-            title: `Method ${config.method} to local link: ${config.url}`,
-            task: () => axios(config)
+            title: `Method Get to local link: ${link}`,
+            task: () => axios({
+              method: 'get',
+              url: link,
+              baseURL: pageUrl,
+              responseType: 'arraybuffer',
+            })
               .then((response) => {
-                debug(`Saving locally from ${config.url}`);
+                debug(`Saving locally from ${link}`);
 
-                const fileName = getFileName(config.url, pageUrl);
+                const fileName = getFileName(link, pageUrl);
                 return fs.writeFile(path.join(srcDirPath, fileName), response.data);
               }),
           };
         });
-      return tasks;
-    })
-    .then((tasks) => {
       debug('Returning promises of requesting tp local resources');
       return new Listr(tasks, { concurrent: true, exitOnError: false })
         .run()
-        .catch((error) => ({ error }));
+        .catch((error) => ({ result: 'error', error }));
     })
     .then(() => {
       debug('Rewriting pageHtml');
