@@ -1,7 +1,10 @@
-# !
+# page-loader!
+
 [![Build Status](https://travis-ci.com/danylokarpenko/backend-project-lvl3.svg?branch=master)](https://travis-ci.com/danylokarpenko/backend-project-lvl3)
 [![Maintainability](https://api.codeclimate.com/v1/badges/dc2fbf21cc23b8de4b59/maintainability)](https://codeclimate.com/github/danylokarpenko/backend-project-lvl3/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/dc2fbf21cc23b8de4b59/test_coverage)](https://codeclimate.com/github/danylokarpenko/backend-project-lvl3/test_coverage)
+
+`PageLoader is a command-line utility that downloads web pages from the internet and saves them on a computer. Along with the page itself, it downloads all the resources (images, styles, and JavaScript), allowing you to open the page without an internet connection.`
 
 ## Install:
 `npm i pageloader-util`
